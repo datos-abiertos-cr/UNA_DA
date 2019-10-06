@@ -1,6 +1,6 @@
 ---
 title: "Análisis exploratorio evaluaciones profesores"
-author: "ronny hdez-mora"
+author: "ronny hdez-mora & María Montero Sánchez"
 date: "9/1/2019"
 output: html_document
 ---
@@ -18,7 +18,18 @@ Los datos contenidos en este reporte han sido tomados de la página de datos
 abiertos de la Universidad  Nacional de Costa Rica. Se descargaron los datos
 disponibles de este [google drive](https://drive.google.com/drive/u/1/folders/1HuLtYe6UMkC9ZF0IQ081qOVGDnGTy1v3)
 y el link directo a los datos es [este](https://drive.google.com/open?id=1f1jnbCmq_n4_ASDYOBhbj6ESB9FkebSN)
-```{r}
 
+```{r}
+evaluacion <- read_excel("datos/UNA-Histórico Evaluación Desempeño Docente 2010-2019.xlsx") %>% 
+  janitor::clean_names()
+```
+
+```{r}
+biolo <- evaluacion %>% 
+  filter(campus == "CAMPUS OMAR DENGO",
+         facultad_centro_sede_seccion == "FACULTAD DE CIENCIAS EXACTAS Y NATURALES",
+         unidad_academica == "CIENCIAS BIOLÓGICAS")
+  
+  
 ```
 
