@@ -26,6 +26,7 @@ evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Doce
   janitor::clean_names()
 ```
 
+## Evaluacion biologia
 ```{r}
 biolo <- evaluacion %>% 
   filter(campus == "CAMPUS OMAR DENGO",
