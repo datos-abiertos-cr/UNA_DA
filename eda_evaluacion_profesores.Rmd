@@ -3,6 +3,8 @@ title: "Análisis exploratorio evaluaciones profesores"
 author: "ronny hdez-mora & María Montero Sánchez"
 date: "9/1/2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -20,10 +22,11 @@ disponibles de este [google drive](https://drive.google.com/drive/u/1/folders/1H
 y el link directo a los datos es [este](https://drive.google.com/open?id=1f1jnbCmq_n4_ASDYOBhbj6ESB9FkebSN)
 
 ```{r}
-evaluacion <- read_excel("datos/UNA-Histórico Evaluación Desempeño Docente 2010-2019.xlsx") %>% 
+evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Docente-Estudiantado.xlsx") %>% 
   janitor::clean_names()
 ```
 
+## Evaluacion biologia
 ```{r}
 biolo <- evaluacion %>% 
   filter(campus == "CAMPUS OMAR DENGO",
