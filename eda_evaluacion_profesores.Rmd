@@ -22,7 +22,7 @@ abiertos de la Universidad  Nacional de Costa Rica. Se descargaron los datos
 disponibles de este [google drive](https://drive.google.com/drive/u/1/folders/1HuLtYe6UMkC9ZF0IQ081qOVGDnGTy1v3)
 y el link directo a los datos es [este](https://drive.google.com/open?id=1f1jnbCmq_n4_ASDYOBhbj6ESB9FkebSN)
 
-```{r}
+```{r leer datos}
 evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Docente-Estudiantado.xlsx") %>% 
   janitor::clean_names()
 ```
@@ -30,7 +30,7 @@ evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Doce
 ## Evaluacion biologia
 
 Vamos a traer unicamente las evaluaciones de biología.
-```{r}
+```{r biologia}
 biolo <- evaluacion %>% 
   filter(campus == "CAMPUS OMAR DENGO",
          facultad_centro_sede_seccion == "FACULTAD DE CIENCIAS EXACTAS Y NATURALES",
@@ -41,10 +41,52 @@ glimpse(biolo)
 
 Tenemos un total de `r nrow(biolo)` observaciones. 
 
+## Responsabilidad estudiantil
 
+Para que un curso pueda ser calificado tiene que contar con la 
+evaluación del 50% de los estudiantes, por lo que hay que hacer un 
+filtro de estas observaciones.
 
-# Responsabilidad estudiantil
-```{r}
-
+Vamos a revisar primero 
+```{r minimo evaluacion}
+ggplot(data = biolo, aes(x = as.factor(sin_50_percent))) +
+  geom_bar() +
+  xlab("Cursos sin evaluaciones completas") +
+  ylab("Total") +
+  theme_classic()
 ```
+
+Podemos revisar además por año qué ha sucedido con las evaluaciones
+```{r}
+ggplot(data = biolo, aes(x = ano,
+                         fill = as.factor(sin_50_percent))) +
+  geom_bar(position = "dodge") +
+  scale_fill_viridis_d() +
+  xlab("Cursos sin evaluaciones completas") +
+  ylab("Total") +
+  theme_classic()
+```
+
+## ¿Cuántos profesores tenemos en el conjunto de datos?
+```{r}
+biolo %>% 
+  distinct(nombre_de_la_persona_docente) %>% 
+  nrow()
+```
+
+¿Cuáles profesores han impartido mayor cantidad de cursos distintos?
+```{r}
+biolo %>% 
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+```
+
+Profesores con mayor cantidad de cursos evaluados
+```{r}
+biolo %>% 
+  filter(sin_50_percent == 0) %>%
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+```
+
 
