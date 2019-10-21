@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(readxl)
+library(lubridate)
 ```
 
 #  Leer datos
@@ -27,12 +28,23 @@ evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Doce
 ```
 
 ## Evaluacion biologia
+
+Vamos a traer unicamente las evaluaciones de biología.
 ```{r}
 biolo <- evaluacion %>% 
   filter(campus == "CAMPUS OMAR DENGO",
          facultad_centro_sede_seccion == "FACULTAD DE CIENCIAS EXACTAS Y NATURALES",
-         unidad_academica == "CIENCIAS BIOLÓGICAS")
-  
-  
+         unidad_academica == "CIENCIAS BIOLOGICAS")
+
+glimpse(biolo)
+```
+
+Tenemos un total de `r nrow(biolo)` observaciones. 
+
+
+
+# Responsabilidad estudiantil
+```{r}
+
 ```
 
