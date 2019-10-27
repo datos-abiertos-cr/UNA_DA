@@ -98,16 +98,64 @@ biolo %>%
 
 # Profesores mejor evaluados
 
+Sacamos un total de los cursos impartidos y sacamos un porcentaje de la 
+cantidad de ocasiones que ha sido evaluado en las distintas categorías
 ```{r}
+# Filtramos observaciones validas
 con_evalucion <- biolo %>% 
-  filter(sin_50_percent == 0) %>%
+  filter(sin_50_percent == 1) %>%
   group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
   tally(sort = TRUE)
 
-biolo %>% 
-  group_by(nombre_de_la_persona_docente, 
-           categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
-  tally()
 
+check <- biolo %>% 
+  # filter(sin_50_percent == 1) %>%
+  # filter(x0_participacion == 1) %>%
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes != "SIN CATEGORIZACION") %>%   group_by(nombre_de_la_persona_docente, 
+           categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+```
+
+```{r}
+# Mal ranqueados
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "DEFICIENTE") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "REGULAR") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "BUENO") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+```
+
+```{r}
+# Agrupar evaluaciones por periodo
+```
+
+```{r}
+# Abstinencia a evaluaciones
+abstinencia <- biolo %>% 
+  mutate(abstinencia = ifelse(puntaje_final_desempeno_docente_segun_estudiantes != "SIN 50%" & 
+                                puntaje_final_desempeno_docente_segun_estudiantes != "0 PARTICIPACION", "MAS 50%", puntaje_final_desempeno_docente_segun_estudiantes)) %>% 
+  mutate(ano = as.numeric(ano))
+
+  
+# Gráfico abstinencia
+ggplot(data = abstinencia, 
+       aes(x = ano, fill = factor(abstinencia,
+                                  levels = c("MAS 50%", "SIN 50%",
+                                             "0 PARTICIPACION")))) +
+  geom_bar() +
+  scale_fill_viridis_d() +
+  scale_x_continuous(breaks = c(2010:2019)) +
+  labs(x = "Año", y = "Cantidad de cursos", fill = "Particación") +
+  theme_minimal()
 ```
 
