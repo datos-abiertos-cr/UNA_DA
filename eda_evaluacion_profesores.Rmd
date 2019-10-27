@@ -22,7 +22,7 @@ abiertos de la Universidad  Nacional de Costa Rica. Se descargaron los datos
 disponibles de este [google drive](https://drive.google.com/drive/u/1/folders/1HuLtYe6UMkC9ZF0IQ081qOVGDnGTy1v3)
 y el link directo a los datos es [este](https://drive.google.com/open?id=1f1jnbCmq_n4_ASDYOBhbj6ESB9FkebSN)
 
-```{r}
+```{r leer datos}
 evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Docente-Estudiantado.xlsx") %>% 
   janitor::clean_names()
 ```
@@ -30,7 +30,7 @@ evaluacion <- read_excel("datos/Universidad Nacional Evaluación Desempeño Doce
 ## Evaluacion biologia
 
 Vamos a traer unicamente las evaluaciones de biología.
-```{r}
+```{r biologia}
 biolo <- evaluacion %>% 
   filter(campus == "CAMPUS OMAR DENGO",
          facultad_centro_sede_seccion == "FACULTAD DE CIENCIAS EXACTAS Y NATURALES",
@@ -41,10 +41,121 @@ glimpse(biolo)
 
 Tenemos un total de `r nrow(biolo)` observaciones. 
 
+## Responsabilidad estudiantil
 
+Para que un curso pueda ser calificado tiene que contar con la 
+evaluación del 50% de los estudiantes, por lo que hay que hacer un 
+filtro de estas observaciones.
 
-# Responsabilidad estudiantil
+Vamos a revisar primero 
+```{r minimo evaluacion}
+ggplot(data = biolo, aes(x = as.factor(sin_50_percent))) +
+  geom_bar() +
+  xlab("Cursos sin evaluaciones completas") +
+  ylab("Total") +
+  theme_classic()
+```
+
+Podemos revisar además por año qué ha sucedido con las evaluaciones
 ```{r}
+ggplot(data = biolo, aes(x = ano,
+                         fill = as.factor(sin_50_percent))) +
+  geom_bar(position = "dodge") +
+  scale_fill_viridis_d() +
+  xlab("Cursos sin evaluaciones completas") +
+  ylab("Total") +
+  theme_classic()
+```
 
+## ¿Cuántos profesores tenemos en el conjunto de datos?
+
+Para todo el conjunto de datos tenemos que hay 198 profesores. 
+
+```{r}
+biolo %>% 
+  distinct(nombre_de_la_persona_docente) %>% 
+  nrow()
+```
+
+¿Cuáles profesores han impartido mayor cantidad de cursos distintos?
+```{r}
+biolo %>% 
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+```
+
+Profesores con mayor cantidad de cursos evaluados
+
+Si bien tenemos profesores con hasta 27 cursos impartidos, las evaulaciones
+que sobrepasan el 50% no llegan al mismo número. En la siguiente tabla tenemos
+la cantidad de profesores con mayor cantidad de cursos evaluados.
+```{r}
+biolo %>% 
+  filter(sin_50_percent == 0) %>%
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+```
+
+# Profesores mejor evaluados
+
+Sacamos un total de los cursos impartidos y sacamos un porcentaje de la 
+cantidad de ocasiones que ha sido evaluado en las distintas categorías
+```{r}
+# Filtramos observaciones validas
+con_evalucion <- biolo %>% 
+  filter(sin_50_percent == 1) %>%
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+
+
+check <- biolo %>% 
+  # filter(sin_50_percent == 1) %>%
+  # filter(x0_participacion == 1) %>%
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes != "SIN CATEGORIZACION") %>%   group_by(nombre_de_la_persona_docente, 
+           categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+```
+
+```{r}
+# Mal ranqueados
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "DEFICIENTE") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "REGULAR") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+biolo %>% 
+  filter(categoriazacion_final_desempeno_docente_segun_estudiantes == "BUENO") %>% 
+  group_by(nombre_de_la_persona_docente, categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally(sort = TRUE)
+
+```
+
+```{r}
+# Agrupar evaluaciones por periodo
+```
+
+```{r}
+# Abstinencia a evaluaciones
+abstinencia <- biolo %>% 
+  mutate(abstinencia = ifelse(puntaje_final_desempeno_docente_segun_estudiantes != "SIN 50%" & 
+                                puntaje_final_desempeno_docente_segun_estudiantes != "0 PARTICIPACION", "MAS 50%", puntaje_final_desempeno_docente_segun_estudiantes)) %>% 
+  mutate(ano = as.numeric(ano))
+
+  
+# Gráfico abstinencia
+ggplot(data = abstinencia, 
+       aes(x = ano, fill = factor(abstinencia,
+                                  levels = c("MAS 50%", "SIN 50%",
+                                             "0 PARTICIPACION")))) +
+  geom_bar() +
+  scale_fill_viridis_d() +
+  scale_x_continuous(breaks = c(2010:2019)) +
+  labs(x = "Año", y = "Cantidad de cursos", fill = "Particación") +
+  theme_minimal()
 ```
 
