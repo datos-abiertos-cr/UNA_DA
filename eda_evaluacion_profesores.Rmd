@@ -68,6 +68,9 @@ ggplot(data = biolo, aes(x = ano,
 ```
 
 ## ¿Cuántos profesores tenemos en el conjunto de datos?
+
+Para todo el conjunto de datos tenemos que hay 198 profesores. 
+
 ```{r}
 biolo %>% 
   distinct(nombre_de_la_persona_docente) %>% 
@@ -82,6 +85,10 @@ biolo %>%
 ```
 
 Profesores con mayor cantidad de cursos evaluados
+
+Si bien tenemos profesores con hasta 27 cursos impartidos, las evaulaciones
+que sobrepasan el 50% no llegan al mismo número. En la siguiente tabla tenemos
+la cantidad de profesores con mayor cantidad de cursos evaluados.
 ```{r}
 biolo %>% 
   filter(sin_50_percent == 0) %>%
@@ -89,4 +96,18 @@ biolo %>%
   tally(sort = TRUE)
 ```
 
+# Profesores mejor evaluados
+
+```{r}
+con_evalucion <- biolo %>% 
+  filter(sin_50_percent == 0) %>%
+  group_by(nombre_de_la_persona_docente, nombre_del_curso) %>% 
+  tally(sort = TRUE)
+
+biolo %>% 
+  group_by(nombre_de_la_persona_docente, 
+           categoriazacion_final_desempeno_docente_segun_estudiantes) %>% 
+  tally()
+
+```
 
